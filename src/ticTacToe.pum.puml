@@ -1,0 +1,98 @@
+@startuml
+
+class Main{
++ static void main(String[] args)
+}
+
+interface BoardGame{
+void play()
+void switchPlayer()
+void announceResult()
+}
+
+class TicTacToeGame{
+- board: Board
+- playerX: Player
+- playerO: Player
+- currentPlayer: Player
+- gameContext: GameContext
+
++ TicTacToeGame(PlayerStrategy xStrategy, PlayerStrategy oStrategy, int rows, int cols)
++ void play()
++ void switchPlayer()
++ void announceResult()
+}
+
+class Board{
+- rows:int
+- cols:int
+- grid[][]:Symbol
+}
+
+class Position{
+- row: int
+- col: int
+}
+
+class Player{
+- symbol: Symbol
+- playerStrategy: PlayerStrategy
+}
+
+interface PlayerStrategy{
+Position makeMove(Board board)
+}
+
+class HumanPlayerStrategy{
+}
+
+class ComputerPlayerStrategy{
+}
+
+enum Symbol{
+X,
+Y
+}
+
+class GameContext{
+- currentGameState: GameState
++ void setGameState(GameState gameState)
++ boolean isGameOver()
+}
+
+interface GameState{
+boolean isGameOver()
+}
+
+class InprogressState{
++ boolean isGameOver()
+}
+
+class XWonState{
++ boolean isGameOver()
+}
+
+class OWonState{
++ boolean isGameOver()
+}
+
+class DrawState{
++ boolean isGameOver()
+}
+
+Main --> TicTacToeGame
+TicTacToeGame ..|> BoardGame
+TicTacToeGame --> Player
+TicTacToeGame --> GameContext
+Board --> Symbol
+Player --> PlayerStrategy
+Player --> Symbol
+HumanPlayerStrategy ..|> PlayerStrategy
+ComputerPlayerStrategy ..|> PlayerStrategy
+GameContext --> GameState
+InprogressState ..|> GameState
+XWonState ..|> GameState
+OWonState ..|> GameState
+DrawState ..|> GameState
+
+@enduml
