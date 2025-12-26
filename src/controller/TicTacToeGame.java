@@ -2,35 +2,44 @@ package controller;
 
 import handler.GameContext;
 import handler.GameState;
-import handler.OWonState;
-import handler.XWonState;
+import handler.WonState;
 import strategy.PlayerStrategy;
 import utility.Board;
 import utility.Player;
 import utility.Position;
-import utility.Symbol;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TicTacToeGame {
+
     private Board board;
-    private Player playerX;
-    private Player playerO;
+    private List<Player> players;
     private Player currentPlayer;
     private GameContext gameContext;
+    private Player winner;
 
 
-    public TicTacToeGame(PlayerStrategy playerStrategyX, PlayerStrategy playerStrategyO,
-                         int rows, int cols) {
+    public void initialize(List<PlayerStrategy> playerStrategies,
+                           int rows, int cols) {
         board = new Board(rows, cols);
-        playerX = new Player(Symbol.X, playerStrategyX);
-        playerO = new Player(Symbol.O, playerStrategyO);
-        currentPlayer = playerX;
-        gameContext = new GameContext();
+        players = new ArrayList<>();
+        createPlayers(playerStrategies);
+        currentPlayer = players.get(0);
+        gameContext = new GameContext(players);
+    }
+
+    private void createPlayers(List<PlayerStrategy> playerStrategies) {
+        int count = 1;
+        for (PlayerStrategy playerStrategy : playerStrategies) {
+            players.add(new Player(count++, playerStrategy.getSymbol(), playerStrategy));
+        }
     }
 
     public void play() {
-        do{
-            board.printBoard();
-//            gameContext.getCurrentGameState().printState();
+        board.printBoard();
+        do {
+            Player currentPlayer = gameContext.getCurrentPlayer();
             // validate the move based on the player strategy
             Position makeMove = currentPlayer.getPlayerStrategy().makeMove(board);
             // after validation
@@ -38,29 +47,57 @@ public class TicTacToeGame {
             board.makeMove(makeMove, currentPlayer);
             // after every move
             // check the game state
+            board.printBoard();
             board.checkGameState(gameContext, currentPlayer);
-            if(!gameContext.isGameOver())
+            if (!gameContext.isGameOver()) {
                 switchPlayer();
-        } while(!gameContext.isGameOver());{
-            announceResult(currentPlayer);
+            }
+
+        } while (!gameContext.isGameOver());
+        {
+            announceResult();
         }
     }
 
     private void switchPlayer() {
-        currentPlayer = (currentPlayer == playerX) ? playerO : playerX;
-        System.out.println("switch player: "+ currentPlayer.getPlayerStrategy().getPlayerName());
+        int currentIndex = players.indexOf(currentPlayer);
+        int nextIndex = (currentIndex + 1) % players.size();
+        currentPlayer = players.get(nextIndex);
+        System.out.println(
+                "Next Turn: " + currentPlayer.getPlayerStrategy().getPlayerName()
+        );
     }
 
-    private void announceResult(Player currentPlayer) {
+    private void announceResult() {
         GameState state = gameContext.getCurrentGameState();
-        board.printBoard();
-        if(state instanceof XWonState){
-            System.out.println("Player "+ currentPlayer.getPlayerStrategy().getPlayerName()+" X Wins");
-        } else if (state instanceof OWonState) {
-            System.out.println("Player "+ currentPlayer.getPlayerStrategy().getPlayerName()+" O Wins");
+
+        if (state instanceof WonState) {
+            winner = ((WonState) state).getWinner();
+            System.out.println(
+                    "Player " + winner.getPlayerStrategy().getPlayerName() +
+                            " with symbol '" + winner.getSymbol() + "' wins!"
+            );
         } else {
             System.out.println("It's a draw!");
         }
     }
 
+    public Board getBoard() {
+        return board;
+    }
+
+    public GameContext getGameContext() {
+        return gameContext;
+    }
+
+    @Override
+    public String toString() {
+        return "TicTacToeGame{" +
+                "board=" + board +
+                ", players=" + players +
+                ", currentPlayer=" + currentPlayer +
+                ", gameContext=" + gameContext +
+                ", winner=" + winner +
+                '}';
+    }
 }

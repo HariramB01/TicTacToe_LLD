@@ -4,22 +4,29 @@ import utility.Board;
 import utility.Position;
 import utility.Symbol;
 
-public class AIPlayerStrategy implements PlayerStrategy{
+import java.util.Scanner;
+
+public class DynamicPlayerStrategy implements PlayerStrategy{
 
     private String playerName;
     private Symbol symbol;
+    private Scanner scanner;
 
-    public AIPlayerStrategy(String playerName, char symbol){
+    public DynamicPlayerStrategy(String playerName, char symbol){
         this.playerName = playerName;
         this.symbol = Symbol.fromChar(symbol);
+        this.scanner = new Scanner(System.in);
     }
 
     @Override
     public Position makeMove(Board board) {
+        int rows = board.getRows();
+        int cols = board.getCols();
         while(true){
-            int row = (int) (Math.random() * board.getRows());
-            int col = (int) (Math.random() * board.getCols());
+            System.out.printf("%s, enter your move (row[0-%d] and col[0-%d): ", playerName, rows, cols);
             try{
+                int row = scanner.nextInt();
+                int col = scanner.nextInt();
                 Position move = new Position(row, col);
                 // move validation
                 if(board.isValidMove(move)){
@@ -28,6 +35,7 @@ public class AIPlayerStrategy implements PlayerStrategy{
                 System.out.println("Invalid move. Try again");
             } catch (Exception e){
                 System.out.println("Invalid input. Please enter row and column as numbers.");
+                scanner.nextLine();
             }
         }
     }
@@ -37,7 +45,6 @@ public class AIPlayerStrategy implements PlayerStrategy{
         return playerName;
     }
 
-    @Override
     public Symbol getSymbol() {
         return symbol;
     }

@@ -2,12 +2,26 @@ package handler;
 
 import utility.Player;
 
+import java.util.List;
+
 public class GameContext {
 
     private GameState currentGameState;
+    private List<Player> players;
+    private int currentPlayerIndex;
 
-    public GameContext(){
-        this.currentGameState = new XTurnState();
+    public GameContext(List<Player> players) {
+        this.players = players;
+        this.currentPlayerIndex = 0;
+        this.currentGameState = new BoardInProgressState();
+    }
+
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
+    }
+
+    public void moveToNextPlayer() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
     }
 
     public GameState getCurrentGameState() {
@@ -22,8 +36,7 @@ public class GameContext {
         return currentGameState.isGameOver();
     }
 
-    public void nextState(Player player, boolean hasWon){
-        currentGameState.nextMove(this, player, hasWon);
+    public void nextState(Player player, utility.GameResult result) {
+        currentGameState.nextMove(this, player, result);
     }
-
 }

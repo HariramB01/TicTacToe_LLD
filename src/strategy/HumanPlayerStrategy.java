@@ -2,6 +2,7 @@ package strategy;
 
 import utility.Board;
 import utility.Position;
+import utility.Symbol;
 
 import java.util.Scanner;
 
@@ -9,13 +10,18 @@ public class HumanPlayerStrategy implements PlayerStrategy {
     private Scanner scanner;
     private String playerName;
 
-    public HumanPlayerStrategy(String playerName) {
+    public HumanPlayerStrategy(String playerName, char symbol) {
         this.playerName = playerName;
         this.scanner = new Scanner(System.in);
     }
 
     public String getPlayerName() {
         return playerName;
+    }
+
+    @Override
+    public Symbol getSymbol() {
+        return null;
     }
 
 

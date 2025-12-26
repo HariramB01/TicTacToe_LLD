@@ -1,10 +1,7 @@
 package helper;
 
 import handler.GameContext;
-import utility.Board;
-import utility.Player;
-import utility.Position;
-import utility.Symbol;
+import utility.*;
 
 public class BoardHelper {
 
@@ -37,7 +34,7 @@ public class BoardHelper {
     public void checkGameState(GameContext gameContext, Player currentPlayer, Board board) {
         for (int i = 0; i < board.getRows(); i++) {
             if (board.getGrid()[i][0] != Symbol.EMPTY && isWinningLine(board.getGrid()[i])) {
-                gameContext.nextState(currentPlayer, true);
+                gameContext.nextState(currentPlayer, GameResult.WIN);
                 return;
             }
         }
@@ -47,7 +44,7 @@ public class BoardHelper {
                 column[j] = board.getGrid()[j][i];
             }
             if (column[0] != Symbol.EMPTY && isWinningLine(column)) {
-                gameContext.nextState(currentPlayer, true);
+                gameContext.nextState(currentPlayer, GameResult.WIN);
                 return;
             }
         }
@@ -58,15 +55,35 @@ public class BoardHelper {
             diagonal2[i] = board.getGrid()[i][board.getCols() - 1 - i];
         }
         if (diagonal1[0] != Symbol.EMPTY && isWinningLine(diagonal1)) {
-            gameContext.nextState(currentPlayer, true);
+            gameContext.nextState(currentPlayer,  GameResult.WIN);
             return;
         }
         if (diagonal2[0] != Symbol.EMPTY && isWinningLine(diagonal2)) {
-            gameContext.nextState(currentPlayer, true);
+            gameContext.nextState(currentPlayer,  GameResult.WIN);
             return;
         }
-        gameContext.nextState(currentPlayer, false);
+        if (isFull(board)) {
+            gameContext.nextState(currentPlayer, GameResult.DRAW);
+            return;
+        }
+
+        gameContext.nextState(currentPlayer,  GameResult.IN_PROGRESS);
     }
+
+    public boolean isFull(Board board) {
+        int rows = board.getRows();
+        int cols = board.getCols();
+        Symbol[][] grid = board.getGrid();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (grid[i][j] == Symbol.EMPTY) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
     private boolean isWinningLine(Symbol[] line) {
         Symbol first = line[0];
